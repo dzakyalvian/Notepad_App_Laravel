@@ -18,23 +18,18 @@ class NoteList extends Component
 
     public function openCreate()
     {
-        $this->reset([
-            'title',
-            'body',
-            'tag',
-            'editingId'
-        ]);
-
+        $this->reset(['title', 'body', 'tag', 'editingId']);
         $this->showForm = true;
     }
 
-    public function openEdit(Note $note)
+    public function openEdit(int $id)
     {
+        $note = Note::findOrFail($id);
+        abort_if($note->user_id !== Auth::id(), 403);
         $this->editingId = $note->id;
         $this->title = $note->title;
         $this->body = $note->body;
         $this->tag = $note->tag ?? '';
-
         $this->showForm = true;
     }
 
@@ -46,19 +41,14 @@ class NoteList extends Component
         ]);
 
         if ($this->editingId) {
-
             $note = Note::findOrFail($this->editingId);
-
             abort_if($note->user_id !== Auth::id(), 403);
-
             $note->update([
                 'title' => $this->title,
                 'body'  => $this->body,
                 'tag'   => $this->tag,
             ]);
-
         } else {
-
             Note::create([
                 'user_id' => Auth::id(),
                 'title'   => $this->title,
@@ -67,46 +57,35 @@ class NoteList extends Component
             ]);
         }
 
-        $this->reset([
-            'title',
-            'body',
-            'tag',
-            'editingId',
-            'showForm'
-        ]);
+        $this->reset(['title', 'body', 'tag', 'editingId', 'showForm']);
     }
 
-    public function toggleFavorite(Note $note)
+    public function toggleFavorite(int $id)
     {
+        $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
-
-        $note->update([
-            'is_favorite' => !$note->is_favorite
-        ]);
+        $note->is_favorite = !$note->is_favorite;
+        $note->save();
     }
 
-    public function delete(Note $note)
+    public function delete(int $id)
     {
+        $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
-
-        $note->update([
-            'is_deleted' => true
-        ]);
+        $note->update(['is_deleted' => true]);
     }
 
-    public function restore(Note $note)
+    public function restore(int $id)
     {
+        $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
-
-        $note->update([
-            'is_deleted' => false
-        ]);
+        $note->update(['is_deleted' => false]);
     }
 
-    public function forceDelete(Note $note)
+    public function forceDelete(int $id)
     {
+        $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
-
         $note->delete();
     }
 
@@ -115,23 +94,15 @@ class NoteList extends Component
         $query = Note::where('user_id', Auth::id());
 
         if ($this->activeTab === 'favorites') {
-
-            $query->where('is_favorite', true)
-                  ->where('is_deleted', false);
-
+            $query->where('is_favorite', true)->where('is_deleted', false);
         } elseif ($this->activeTab === 'trash') {
-
             $query->where('is_deleted', true);
-
         } else {
-
             $query->where('is_deleted', false);
         }
 
         if ($this->search) {
-
             $query->where(function ($q) {
-
                 $q->where('title', 'like', '%' . $this->search . '%')
                   ->orWhere('body', 'like', '%' . $this->search . '%');
             });
@@ -139,13 +110,12 @@ class NoteList extends Component
 
         return view('livewire.notes.note-list', [
             'notes' => $query->latest()->get(),
-
-            'tags' => Note::where('user_id', Auth::id())
-                ->where('is_deleted', false)
-                ->whereNotNull('tag')
-                ->pluck('tag')
-                ->unique()
-                ->values(),
+            'tags'  => Note::where('user_id', Auth::id())
+                        ->where('is_deleted', false)
+                        ->whereNotNull('tag')
+                        ->pluck('tag')
+                        ->unique()
+                        ->values(),
         ]);
     }
 }
