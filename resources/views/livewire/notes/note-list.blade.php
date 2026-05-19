@@ -1,7 +1,8 @@
 <div style="display:flex; min-height:100vh; background:#1a1a1a; color:#e5e5e5; font-family:sans-serif;">
 
     {{-- SIDEBAR --}}
-    <div style="width:220px; background:#1f1f1f; border-right:1px solid #2e2e2e; padding:1rem; display:flex; flex-direction:column; gap:6px;">
+    <div
+        style="width:220px; background:#1f1f1f; border-right:1px solid #2e2e2e; padding:1rem; display:flex; flex-direction:column; gap:6px;">
 
         <button wire:click="openCreate"
             style="background:#ea580c; color:white; border:none; border-radius:8px; padding:10px; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
@@ -11,7 +12,8 @@
         <button wire:click="$set('activeTab', 'all')"
             style="background:{{ $activeTab === 'all' ? '#2e2e2e' : 'transparent' }}; color:{{ $activeTab === 'all' ? '#f5f5f5' : '#a3a3a3' }}; border:none; border-radius:8px; padding:9px 12px; text-align:left; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:8px;">
             ☰ All notes
-            <span style="margin-left:auto; font-size:12px; color:#525252;">{{ auth()->user()->notes()->where('is_deleted', false)->count() }}</span>
+            <span
+                style="margin-left:auto; font-size:12px; color:#525252;">{{ auth()->user()->notes()->where('is_deleted', false)->count() }}</span>
         </button>
 
         <button wire:click="$set('activeTab', 'favorites')"
@@ -26,10 +28,13 @@
 
         @if ($tags->count() > 0)
             <div style="margin-top:1rem;">
-                <p style="font-size:11px; color:#525252; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; padding:0 4px;">Tags</p>
+                <p
+                    style="font-size:11px; color:#525252; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; padding:0 4px;">
+                    Tags</p>
                 <div style="display:flex; flex-wrap:wrap; gap:6px; padding:0 4px;">
                     @foreach ($tags as $t)
-                        <span style="font-size:12px; padding:3px 10px; border-radius:99px; background:#2e2e2e; color:#a3a3a3; cursor:pointer;">{{ $t }}</span>
+                        <span
+                            style="font-size:12px; padding:3px 10px; border-radius:99px; background:#2e2e2e; color:#a3a3a3; cursor:pointer;">{{ $t }}</span>
                     @endforeach
                 </div>
             </div>
@@ -40,7 +45,8 @@
     <div style="flex:1; padding:1.5rem; display:flex; flex-direction:column; gap:1rem;">
 
         {{-- SEARCH --}}
-        <div style="display:flex; align-items:center; gap:8px; background:#2a2a2a; border:1px solid #2e2e2e; border-radius:8px; padding:10px 14px;">
+        <div
+            style="display:flex; align-items:center; gap:8px; background:#2a2a2a; border:1px solid #2e2e2e; border-radius:8px; padding:10px 14px;">
             <span style="color:#525252;"><i class="fa-solid fa-magnifying-glass"></i></span>
             <input wire:model.live="search" type="text" placeholder="Search notes..."
                 style="background:transparent; border:none; outline:none; color:#e5e5e5; font-size:14px; width:100%;">
@@ -48,7 +54,8 @@
 
         {{-- FORM --}}
         @if ($showForm)
-            <div style="background:#242424; border:1px solid #2e2e2e; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; gap:10px;">
+            <div
+                style="background:#242424; border:1px solid #2e2e2e; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; gap:10px;">
                 <input wire:model="title" type="text" placeholder="Title"
                     style="background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:10px 14px; color:#f5f5f5; font-size:15px; font-weight:500; outline:none; width:100%;">
                 @error('title')
@@ -80,13 +87,13 @@
         {{-- NOTES GRID --}}
         <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px;">
             @forelse($notes as $note)
-                <div style="background:#242424; border:1px solid #2e2e2e; border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:8px;">
+                <div wire:key="note-{{ $note->id }}"
+                    style="background:#242424; border:1px solid #2e2e2e; border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:8px;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                         <p style="font-size:15px; font-weight:500; color:#f5f5f5;">{{ $note->title }}</p>
                         @if ($activeTab !== 'trash')
                             <button wire:click="toggleFavorite({{ $note->id }})"
-                                wire:key="star-{{ $note->id }}"
-                                class="btn-star"
+                                wire:key="star-{{ $note->id }}" class="btn-star"
                                 style="color:{{ $note->is_favorite ? '#facc15' : '#525252' }};">
                                 @if ($note->is_favorite)
                                     <i class="fa-solid fa-star"></i>
@@ -103,7 +110,8 @@
 
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
                         @if ($note->tag)
-                            <span style="font-size:11px; padding:3px 10px; border-radius:99px; background:#2e2e2e; color:#a3a3a3;">{{ $note->tag }}</span>
+                            <span
+                                style="font-size:11px; padding:3px 10px; border-radius:99px; background:#2e2e2e; color:#a3a3a3;">{{ $note->tag }}</span>
                         @else
                             <span></span>
                         @endif
