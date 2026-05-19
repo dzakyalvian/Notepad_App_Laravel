@@ -11,6 +11,13 @@ class NoteList extends Component
     public string $title = '';
     public string $body = '';
     public string $tag = '';
+    public array $availableTags = [
+        ['name' => 'Personal',  'color' => '#a78bfa'],
+        ['name' => 'Work',      'color' => '#34d399'],
+        ['name' => 'Idea',      'color' => '#fbbf24'],
+        ['name' => 'Important', 'color' => '#f87171'],
+        ['name' => 'Study',     'color' => '#60a5fa'],
+    ];
     public ?int $editingId = null;
     public bool $showForm = false;
     public string $search = '';
@@ -104,18 +111,19 @@ class NoteList extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('title', 'like', '%' . $this->search . '%')
-                  ->orWhere('body', 'like', '%' . $this->search . '%');
+                    ->orWhere('body', 'like', '%' . $this->search . '%');
             });
         }
 
         return view('livewire.notes.note-list', [
             'notes' => $query->latest()->get(),
             'tags'  => Note::where('user_id', Auth::id())
-                        ->where('is_deleted', false)
-                        ->whereNotNull('tag')
-                        ->pluck('tag')
-                        ->unique()
-                        ->values(),
+                ->where('is_deleted', false)
+                ->whereNotNull('tag')
+                ->pluck('tag')
+                ->unique()
+                ->values(),
+            'availableTags' => $this->availableTags,
         ]);
     }
 }

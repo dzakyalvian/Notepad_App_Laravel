@@ -68,9 +68,34 @@
                     <span style="color:#f87171; font-size:12px;">{{ $message }}</span>
                 @enderror
 
-                <input wire:model="tag" type="text" placeholder="Tag (e.g. Kuliah, Ide, Tugas)"
-                    style="background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:10px 14px; color:#e5e5e5; font-size:13px; outline:none; width:100%;">
-
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <button type="button" wire:click="$set('tag', 'Personal')"
+                        style="padding:5px 14px; border-radius:99px; border:2px solid #a78bfa; background:{{ $tag === 'Personal' ? '#a78bfa' : 'transparent' }}; color:{{ $tag === 'Personal' ? '#1a1a1a' : '#a78bfa' }}; font-size:12px; font-weight:500; cursor:pointer;">
+                        Personal
+                    </button>
+                    <button type="button" wire:click="$set('tag', 'Work')"
+                        style="padding:5px 14px; border-radius:99px; border:2px solid #34d399; background:{{ $tag === 'Work' ? '#34d399' : 'transparent' }}; color:{{ $tag === 'Work' ? '#1a1a1a' : '#34d399' }}; font-size:12px; font-weight:500; cursor:pointer;">
+                        Work
+                    </button>
+                    <button type="button" wire:click="$set('tag', 'Idea')"
+                        style="padding:5px 14px; border-radius:99px; border:2px solid #fbbf24; background:{{ $tag === 'Idea' ? '#fbbf24' : 'transparent' }}; color:{{ $tag === 'Idea' ? '#1a1a1a' : '#fbbf24' }}; font-size:12px; font-weight:500; cursor:pointer;">
+                        Idea
+                    </button>
+                    <button type="button" wire:click="$set('tag', 'Important')"
+                        style="padding:5px 14px; border-radius:99px; border:2px solid #f87171; background:{{ $tag === 'Important' ? '#f87171' : 'transparent' }}; color:{{ $tag === 'Important' ? '#1a1a1a' : '#f87171' }}; font-size:12px; font-weight:500; cursor:pointer;">
+                        Important
+                    </button>
+                    <button type="button" wire:click="$set('tag', 'Study')"
+                        style="padding:5px 14px; border-radius:99px; border:2px solid #60a5fa; background:{{ $tag === 'Study' ? '#60a5fa' : 'transparent' }}; color:{{ $tag === 'Study' ? '#1a1a1a' : '#60a5fa' }}; font-size:12px; font-weight:500; cursor:pointer;">
+                        Study
+                    </button>
+                    @if ($tag)
+                        <button type="button" wire:click="$set('tag', '')"
+                            style="padding:5px 14px; border-radius:99px; border:2px solid #3a3a3a; background:transparent; color:#525252; font-size:12px; cursor:pointer;">
+                            ✕ Clear
+                        </button>
+                    @endif
+                </div>
                 <div style="display:flex; gap:8px;">
                     <button wire:click="save"
                         style="background:#ea580c; color:white; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:500; cursor:pointer;">
@@ -111,7 +136,29 @@
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
                         @if ($note->tag)
                             <span
-                                style="font-size:11px; padding:3px 10px; border-radius:99px; background:#2e2e2e; color:#a3a3a3;">{{ $note->tag }}</span>
+                                style="font-size:11px; padding:3px 10px; border-radius:99px; background:transparent; border:1.5px solid
+    {{ $note->tag === 'Personal'
+        ? '#a78bfa'
+        : ($note->tag === 'Work'
+            ? '#34d399'
+            : ($note->tag === 'Idea'
+                ? '#fbbf24'
+                : ($note->tag === 'Important'
+                    ? '#f87171'
+                    : ($note->tag === 'Study'
+                        ? '#60a5fa'
+                        : '#525252')))) }}; color:
+    {{ $note->tag === 'Personal'
+        ? '#a78bfa'
+        : ($note->tag === 'Work'
+            ? '#34d399'
+            : ($note->tag === 'Idea'
+                ? '#fbbf24'
+                : ($note->tag === 'Important'
+                    ? '#f87171'
+                    : ($note->tag === 'Study'
+                        ? '#60a5fa'
+                        : '#a3a3a3')))) }};">{{ $note->tag }}</span>
                         @else
                             <span></span>
                         @endif
@@ -140,7 +187,7 @@
                 </div>
             @empty
                 <div style="grid-column:1/-1; text-align:center; padding:3rem; color:#525252;">
-                    <p style="font-size:32px; margin-bottom:8px;">📝</p>
+                    <p style="font-size:32px; margin-bottom:8px;"><i class="fa-solid fa-bookmark"></i></p>
                     <p style="font-size:14px;">No notes yet. Create your first note!</p>
                 </div>
             @endforelse
