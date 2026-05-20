@@ -4,10 +4,13 @@ namespace App\Livewire\Notes;
 
 use App\Models\Note;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
 
 class NoteList extends Component
 {
+    use WithPagination;
+
     public string $title = '';
     public string $body = '';
     public string $tag = '';
@@ -22,6 +25,17 @@ class NoteList extends Component
     public bool $showForm = false;
     public string $search = '';
     public string $activeTab = 'all';
+
+    // Reset halaman saat search atau ganti tab
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedActiveTab()
+    {
+        $this->resetPage();
+    }
 
     public function openCreate()
     {
@@ -98,7 +112,8 @@ class NoteList extends Component
 
     public function render()
     {
-        $query = Note::where('user_id', Auth::id());
+        $query = Note::where('user_id', Auth::id())
+            ->select('id', 'title', 'body', 'tag', 'is_favorite', 'is_deleted', 'created_at');
 
         if ($this->activeTab === 'favorites') {
             $query->where('is_favorite', true)->where('is_deleted', false);
@@ -116,14 +131,17 @@ class NoteList extends Component
         }
 
         return view('livewire.notes.note-list', [
-            'notes' => $query->latest()->get(),
+            'notes' => $query->latest()->paginate(12),
             'tags'  => Note::where('user_id', Auth::id())
                 ->where('is_deleted', false)
                 ->whereNotNull('tag')
-                ->pluck('tag')
-                ->unique()
-                ->values(),
+                ->select('tag')
+                ->distinct()
+                ->pluck('tag'),
             'availableTags' => $this->availableTags,
+            'totalNotes' => Note::where('user_id', Auth::id())
+                ->where('is_deleted', false)
+                ->count(),
         ]);
     }
 }

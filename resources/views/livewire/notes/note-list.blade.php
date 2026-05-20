@@ -11,7 +11,7 @@
         <button wire:click="$set('activeTab', 'all')"
             style="background:{{ $activeTab === 'all' ? '#2e2e2e' : 'transparent' }}; color:{{ $activeTab === 'all' ? '#f5f5f5' : '#a3a3a3' }}; border:none; border-radius:8px; padding:9px 12px; text-align:left; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:8px;">
             ☰ All notes
-            <span style="margin-left:auto; font-size:12px; color:#525252;">{{ auth()->user()->notes()->where('is_deleted', false)->count() }}</span>
+            <span style="margin-left:auto; font-size:12px; color:#525252;">{{ $totalNotes }}</span>
         </button>
 
         <button wire:click="$set('activeTab', 'favorites')"
@@ -46,7 +46,7 @@
         {{-- SEARCH --}}
         <div style="display:flex; align-items:center; gap:8px; background:#2a2a2a; border:1px solid #2e2e2e; border-radius:8px; padding:10px 14px;">
             <span style="color:#525252;"><i class="fa-solid fa-magnifying-glass"></i></span>
-            <input wire:model.live="search" type="text" placeholder="Search notes..."
+            <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search notes..."
                 style="background:transparent; border:none; outline:none; color:#e5e5e5; font-size:14px; width:100%;">
         </div>
 
@@ -188,5 +188,27 @@
                 </div>
             @endforelse
         </div>
+
+        {{-- PAGINATION --}}
+        @if($notes->hasPages())
+            <div style="display:flex; justify-content:center; align-items:center; gap:6px; margin-top:1rem;">
+                @if($notes->onFirstPage())
+                    <span style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#525252; font-size:13px;">← Prev</span>
+                @else
+                    <button wire:click="previousPage" style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#e5e5e5; font-size:13px; border:none; cursor:pointer;">← Prev</button>
+                @endif
+
+                <span style="padding:6px 12px; color:#525252; font-size:13px;">
+                    {{ $notes->currentPage() }} / {{ $notes->lastPage() }}
+                </span>
+
+                @if($notes->hasMorePages())
+                    <button wire:click="nextPage" style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#e5e5e5; font-size:13px; border:none; cursor:pointer;">Next →</button>
+                @else
+                    <span style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#525252; font-size:13px;">Next →</span>
+                @endif
+            </div>
+        @endif
+
     </div>
 </div>
