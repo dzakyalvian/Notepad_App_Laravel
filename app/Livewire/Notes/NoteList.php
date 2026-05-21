@@ -14,6 +14,8 @@ class NoteList extends Component
     public string $title = '';
     public string $body = '';
     public string $tag = '';
+    public string $customTag = '';
+    public bool $showCustomTag = false;
     public array $availableTags = [
         ['name' => 'Personal',  'color' => '#a78bfa'],
         ['name' => 'Work',      'color' => '#34d399'],
@@ -26,35 +28,34 @@ class NoteList extends Component
     public string $search = '';
     public string $activeTab = 'all';
 
-    // Reset halaman saat search atau ganti tab
-    public function updatedSearch()
+    public function updatedSearch(): void
     {
         $this->resetPage();
     }
 
-    public function updatedActiveTab()
+    public function updatedActiveTab(): void
     {
         $this->resetPage();
     }
 
-    public function openCreate()
+    public function openCreate(): void
     {
         $this->reset(['title', 'body', 'tag', 'editingId']);
         $this->showForm = true;
     }
 
-    public function openEdit(int $id)
+    public function openEdit(int $id): void
     {
         $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
         $this->editingId = $note->id;
-        $this->title = $note->title;
-        $this->body = $note->body;
-        $this->tag = $note->tag ?? '';
-        $this->showForm = true;
+        $this->title     = $note->title;
+        $this->body      = $note->body;
+        $this->tag       = $note->tag ?? '';
+        $this->showForm  = true;
     }
 
-    public function save()
+    public function save(): void
     {
         $this->validate([
             'title' => 'required',
@@ -81,7 +82,7 @@ class NoteList extends Component
         $this->reset(['title', 'body', 'tag', 'editingId', 'showForm']);
     }
 
-    public function toggleFavorite(int $id)
+    public function toggleFavorite(int $id): void
     {
         $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
@@ -89,38 +90,53 @@ class NoteList extends Component
         $note->save();
     }
 
-    public function delete(int $id)
+    public function delete(int $id): void
     {
         $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
         $note->update(['is_deleted' => true]);
     }
 
-    public function restore(int $id)
+    public function cancelForm(): void
+    {
+        $this->reset(['title', 'body', 'tag', 'editingId', 'showForm']);
+        $this->activeTab = 'all';
+    }
+
+    public function restore(int $id): void
     {
         $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
         $note->update(['is_deleted' => false]);
     }
 
-    public function forceDelete(int $id)
+    public function forceDelete(int $id): void
     {
         $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
         $note->delete();
     }
 
+    public function applyCustomTag(): void
+    {
+        if (trim($this->customTag) !== '') {
+            $this->tag = trim($this->customTag);
+            $this->customTag = '';
+            $this->showCustomTag = false;
+        }
+    }
+
     public function render()
     {
-        $query = Note::where('user_id', Auth::id())
+        $query = Note::forUser(Auth::id())
             ->select('id', 'title', 'body', 'tag', 'is_favorite', 'is_deleted', 'created_at');
 
         if ($this->activeTab === 'favorites') {
-            $query->where('is_favorite', true)->where('is_deleted', false);
+            $query->favorites();
         } elseif ($this->activeTab === 'trash') {
-            $query->where('is_deleted', true);
+            $query->trashed();
         } else {
-            $query->where('is_deleted', false);
+            $query->active();
         }
 
         if ($this->search) {
@@ -131,17 +147,10 @@ class NoteList extends Component
         }
 
         return view('livewire.notes.note-list', [
-            'notes' => $query->latest()->paginate(12),
-            'tags'  => Note::where('user_id', Auth::id())
-                ->where('is_deleted', false)
-                ->whereNotNull('tag')
-                ->select('tag')
-                ->distinct()
-                ->pluck('tag'),
+            'notes'         => $query->latest()->paginate(12),
+            'tags' => Note::forUser(Auth::id())->active()->whereNotNull('tag')->where('tag', '!=', '')->select('tag')->distinct()->pluck('tag'),
             'availableTags' => $this->availableTags,
-            'totalNotes' => Note::where('user_id', Auth::id())
-                ->where('is_deleted', false)
-                ->count(),
+            'totalNotes'    => Note::forUser(Auth::id())->active()->count(),
         ]);
     }
 }
