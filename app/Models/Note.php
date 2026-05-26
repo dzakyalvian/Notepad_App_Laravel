@@ -14,11 +14,13 @@ class Note extends Model
     'tag',
     'is_favorite',
     'is_pinned',
+    'is_archived',
     'is_deleted',
 ];
 
     protected $casts = [
         'is_favorite' => 'boolean',
+        'is_archived' => 'boolean',
         'is_deleted'  => 'boolean',
         'is_pinned'   => 'boolean',
     ];
@@ -31,13 +33,19 @@ class Note extends Model
     // Scope buat filter active notes
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_deleted', false);
+        return $query->where('is_deleted', false)->where('is_archived', false);
     }
 
     // Scope buat filter favorites
     public function scopeFavorites(Builder $query): Builder
     {
-        return $query->where('is_favorite', true)->where('is_deleted', false);
+        return $query->where('is_favorite', true)->where('is_deleted', false)->where('is_archived', false);
+    }
+
+    // Scope buat filter archive
+    public function scopeArchived(Builder $query): Builder
+    {
+        return $query->where('is_archived', true)->where('is_deleted', false);
     }
 
     // Scope buat filter trash

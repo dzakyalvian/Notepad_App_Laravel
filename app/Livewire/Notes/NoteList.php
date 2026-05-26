@@ -91,13 +91,20 @@ class NoteList extends Component
     }
 
     public function togglePin($id)
-{
-    $note = Note::findOrFail($id);
+    {
+        $note = Note::findOrFail($id);
 
-    $note->update([
-        'is_pinned' => !$note->is_pinned
-    ]);
-}
+        $note->update([
+            'is_pinned' => !$note->is_pinned
+        ]);
+    }
+
+    public function toggleArchive(int $id): void
+    {
+        $note = Note::findOrFail($id);
+        abort_if($note->user_id !== Auth::id(), 403);
+        $note->update(['is_archived' => !$note->is_archived]);
+    }
 
     public function delete(int $id): void
     {
@@ -146,6 +153,7 @@ class NoteList extends Component
                 'tag',
                 'is_favorite',
                 'is_pinned',
+                'is_archived',
                 'is_deleted',
                 'created_at'
             );
@@ -155,6 +163,8 @@ class NoteList extends Component
             $baseQuery->favorites();
         } elseif ($this->activeTab === 'trash') {
             $baseQuery->trashed();
+        } elseif ($this->activeTab === 'archive') {
+            $baseQuery->archived();
         } else {
             $baseQuery->active();
         }

@@ -32,6 +32,15 @@
             <i class="fa-regular fa-star"></i> Favorites
         </button>
 
+        {{-- Archive --}}
+        <button wire:click="$set('activeTab', 'archive')" 
+            class="border-none rounded-r-[24px] rounded-l-none py-2.5 px-6 text-left text-sm font-medium cursor-pointer flex items-center gap-3 w-[calc(100%-8px)] transition-colors
+            {{ $activeTab === 'archive' 
+                ? 'bg-brand-light dark:bg-[#413123] text-brand-primary dark:text-[#fb923c] hover:bg-brand-light/80 dark:hover:bg-[#523d2b] hover:text-brand-dark font-semibold' 
+                : 'bg-transparent text-keep-textSecondary dark:text-[#9aa0a6] hover:bg-keep-border/40 dark:hover:bg-[#3c4043] hover:text-keep-textPrimary dark:hover:text-[#e8eaed]' }}">
+            <i class="fa-solid fa-box-archive"></i> Archive
+        </button>
+
         {{-- Trash --}}
         <button wire:click="$set('activeTab', 'trash')" 
             class="border-none rounded-r-[24px] rounded-l-none py-2.5 px-6 text-left text-sm font-medium cursor-pointer flex items-center gap-3 w-[calc(100%-8px)] transition-colors

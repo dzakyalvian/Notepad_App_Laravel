@@ -21,18 +21,24 @@
     </p>
 
     <div class="flex justify-between items-center mt-auto pt-2">
-        @if ($note->tag)
-            <span class="text-[10px] px-2.5 py-0.5 rounded-full font-medium
-                {{ $note->tag === 'Personal' ? 'bg-tag-personalBg dark:bg-purple-900/30 text-tag-personalText dark:text-purple-300' : 
-                   ($note->tag === 'Work' ? 'bg-tag-workBg dark:bg-emerald-900/30 text-tag-workText dark:text-emerald-300' : 
-                   ($note->tag === 'Idea' ? 'bg-tag-ideaBg dark:bg-amber-900/30 text-tag-ideaText dark:text-amber-300' : 
-                   ($note->tag === 'Important' ? 'bg-tag-importantBg dark:bg-red-900/30 text-tag-importantText dark:text-red-300' : 
-                   ($note->tag === 'Study' ? 'bg-tag-studyBg dark:bg-blue-900/30 text-tag-studyText dark:text-blue-300' : 'bg-tag-defaultBg dark:bg-[#3c4043] text-tag-defaultText dark:text-[#e8eaed]')))) }}">
-                {{ $note->tag }}
-            </span>
-        @else
-            <span></span>
-        @endif
+        <div class="flex items-center gap-1">
+            @if ($note->tag)
+                <span class="text-[10px] px-2.5 py-0.5 rounded-full font-medium
+                    {{ $note->tag === 'Personal' ? 'bg-tag-personalBg dark:bg-purple-900/30 text-tag-personalText dark:text-purple-300' : 
+                       ($note->tag === 'Work' ? 'bg-tag-workBg dark:bg-emerald-900/30 text-tag-workText dark:text-emerald-300' : 
+                       ($note->tag === 'Idea' ? 'bg-tag-ideaBg dark:bg-amber-900/30 text-tag-ideaText dark:text-amber-300' : 
+                       ($note->tag === 'Important' ? 'bg-tag-importantBg dark:bg-red-900/30 text-tag-importantText dark:text-red-300' : 
+                       ($note->tag === 'Study' ? 'bg-tag-studyBg dark:bg-blue-900/30 text-tag-studyText dark:text-blue-300' : 'bg-tag-defaultBg dark:bg-[#3c4043] text-tag-defaultText dark:text-[#e8eaed]')))) }}">
+                    {{ $note->tag }}
+                </span>
+            @endif
+
+            @if ($note->is_archived && $activeTab !== 'archive')
+                <span class="text-[10px] px-2.5 py-0.5 rounded-full font-medium bg-gray-100 dark:bg-[#3c4043] text-gray-500 dark:text-[#9aa0a6]" data-tooltip="Archived">
+                    <i class="fa-solid fa-box-archive"></i>
+                </span>
+            @endif
+        </div>
 
         @if ($activeTab === 'trash')
             <div class="flex gap-1.5">
@@ -54,6 +60,17 @@
                         <i class="fa-solid fa-thumbtack"></i>
                     @else
                         <i class="fa-solid fa-thumbtack opacity-60"></i>
+                    @endif
+                </button>
+
+                {{-- ARCHIVE --}}
+                <button wire:click="toggleArchive({{ $note->id }})" 
+                    class="bg-transparent border-none cursor-pointer text-keep-textSecondary dark:text-[#9aa0a6] text-xs p-1 rounded-full flex items-center justify-center w-7 h-7 transition-colors hover:bg-keep-bg dark:hover:bg-[#3c4043] hover:text-keep-textPrimary dark:hover:text-[#e8eaed]"
+                    data-tooltip="{{ $note->is_archived ? 'Unarchive' : 'Archive' }}">
+                    @if ($note->is_archived)
+                        <i class="fa-solid fa-box-open"></i>
+                    @else
+                        <i class="fa-solid fa-box-archive"></i>
                     @endif
                 </button>
 
