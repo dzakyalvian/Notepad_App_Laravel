@@ -1,47 +1,64 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+    <h1 class="auth-title">Selamat datang kembali</h1>
+    <p class="auth-subtitle">Masuk ke akun kamu untuk melanjutkan.</p>
+
+    @if (session('status'))
+        <div class="session-status">{{ session('status') }}</div>
+    @endif
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                class="form-input"
+                value="{{ old('email') }}"
+                placeholder="kamu@email.com"
+                required
+                autofocus
+                autocomplete="username"
+            >
+            @error('email')
+                <p class="form-error">{{ $message }}</p>
+            @enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="form-group">
+            <div class="form-label-row">
+                <label for="password" class="form-label" style="margin-bottom:0;">Password</label>
+                @if (Route::has('password.request'))
+                    <a href="{{ route('password.request') }}" class="forgot-link">Lupa password?</a>
+                @endif
+            </div>
+            <input
+                id="password"
+                type="password"
+                name="password"
+                class="form-input"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+            >
+            @error('password')
+                <p class="form-error">{{ $message }}</p>
+            @enderror
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
+        <div class="checkbox-group">
+            <input id="remember_me" type="checkbox" class="form-checkbox" name="remember">
+            <label for="remember_me" class="checkbox-label">Ingat saya</label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="btn-auth">Masuk</button>
     </form>
+
+    <p class="auth-footer">
+        Belum punya akun? <a href="{{ route('register') }}">Daftar sekarang</a>
+    </p>
+
 </x-guest-layout>
