@@ -4,7 +4,7 @@
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden sm:hidden transition-opacity"></div>
 
     {{-- SIDEBAR --}}
-    <div id="sidebar" class="fixed sm:static inset-y-0 left-0 transform -translate-x-full sm:translate-x-0 w-60 bg-keep-bg dark:bg-[#202124] sm:bg-transparent dark:sm:bg-transparent py-4 flex flex-col gap-1 shrink-0 z-50 transition-transform duration-200 ease-in-out border-r border-keep-border/60 dark:border-[#5f6368] sm:border-none">
+    <div id="sidebar" class="fixed sm:sticky inset-y-0 sm:top-[65px] sm:h-[calc(100vh-65px)] left-0 transform -translate-x-full sm:translate-x-0 w-60 bg-keep-bg dark:bg-[#202124] sm:bg-transparent dark:sm:bg-transparent py-4 flex flex-col gap-1 shrink-0 z-50 transition-transform duration-200 ease-in-out border-r border-keep-border/60 dark:border-[#5f6368] sm:border-none overflow-y-auto">
 
         <div class="px-4 pb-4">
             <button wire:click="openCreate"
@@ -98,8 +98,51 @@
                     <span class="text-[#d93025] dark:text-[#f28b82] text-xs">{{ $message }}</span>
                 @enderror
 
-                <textarea wire:model="body" placeholder="Write your note here..." rows="4"
-                    class="bg-transparent border-none text-keep-textBody dark:text-[#e8eaed] placeholder-keep-textSecondary/70 dark:placeholder-[#9aa0a6]/70 text-sm outline-none w-full resize-none py-1 leading-relaxed"></textarea>
+                {{-- RICH TEXT EDITOR --}}
+                <div x-data="{
+                        body: @entangle('body'),
+                        init() {
+                            this.$refs.editor.innerHTML = this.body;
+                            this.$refs.editor.addEventListener('input', () => {
+                                this.body = this.$refs.editor.innerHTML;
+                            });
+                            this.$watch('body', value => {
+                                if(this.$refs.editor.innerHTML !== value) {
+                                    this.$refs.editor.innerHTML = value || '';
+                                }
+                            });
+                        },
+                        format(cmd, val = null) {
+                            document.execCommand(cmd, false, val);
+                            this.$refs.editor.focus();
+                        }
+                    }">
+                    
+                    {{-- TOOLBAR --}}
+                    <div class="flex gap-1 border-b border-keep-border/50 dark:border-[#5f6368]/50 pb-2 mb-2">
+                        <button type="button" @click="format('bold')" class="text-keep-textSecondary hover:text-keep-textPrimary dark:text-[#9aa0a6] dark:hover:text-[#e8eaed] hover:bg-keep-bg dark:hover:bg-[#3c4043] rounded px-2.5 py-1 text-sm transition-colors" title="Bold">
+                            <i class="fa-solid fa-bold"></i>
+                        </button>
+                        <button type="button" @click="format('italic')" class="text-keep-textSecondary hover:text-keep-textPrimary dark:text-[#9aa0a6] dark:hover:text-[#e8eaed] hover:bg-keep-bg dark:hover:bg-[#3c4043] rounded px-2.5 py-1 text-sm transition-colors" title="Italic">
+                            <i class="fa-solid fa-italic"></i>
+                        </button>
+                        <button type="button" @click="format('underline')" class="text-keep-textSecondary hover:text-keep-textPrimary dark:text-[#9aa0a6] dark:hover:text-[#e8eaed] hover:bg-keep-bg dark:hover:bg-[#3c4043] rounded px-2.5 py-1 text-sm transition-colors" title="Underline">
+                            <i class="fa-solid fa-underline"></i>
+                        </button>
+                        <div class="w-[1px] bg-keep-border/50 dark:bg-[#5f6368]/50 mx-1"></div>
+                        <button type="button" @click="format('formatBlock', 'H1')" class="text-keep-textSecondary hover:text-keep-textPrimary dark:text-[#9aa0a6] dark:hover:text-[#e8eaed] hover:bg-keep-bg dark:hover:bg-[#3c4043] rounded px-2.5 py-1 text-xs font-bold transition-colors" title="Heading 1">
+                            H1
+                        </button>
+                        <button type="button" @click="format('formatBlock', 'H2')" class="text-keep-textSecondary hover:text-keep-textPrimary dark:text-[#9aa0a6] dark:hover:text-[#e8eaed] hover:bg-keep-bg dark:hover:bg-[#3c4043] rounded px-2.5 py-1 text-xs font-bold transition-colors" title="Heading 2">
+                            H2
+                        </button>
+                    </div>
+
+                    {{-- EDITOR AREA --}}
+                    <div x-ref="editor" contenteditable="true" 
+                        class="bg-transparent border-none text-keep-textBody dark:text-[#e8eaed] text-sm outline-none w-full min-h-[100px] py-1 leading-relaxed format-editor empty:before:content-[attr(placeholder)] empty:before:text-keep-textSecondary/70 dark:empty:before:text-[#9aa0a6]/70"
+                        placeholder="Write your note here..."></div>
+                </div>
                 @error('body')
                     <span class="text-[#d93025] text-xs">{{ $message }}</span>
                 @enderror

@@ -16,6 +16,7 @@ class NoteList extends Component
     public string $tag = '';
     public string $customTag = '';
     public bool $showCustomTag = false;
+    public bool $showForm = false;
     public array $availableTags = [
         ['name' => 'Personal',  'color' => '#a78bfa'],
         ['name' => 'Work',      'color' => '#34d399'],
@@ -24,7 +25,8 @@ class NoteList extends Component
         ['name' => 'Study',     'color' => '#60a5fa'],
     ];
     public ?int $editingId = null;
-    public bool $showForm = false;
+    public bool $showTagPopup = false;
+    public bool $showFormattingPopup = false;
     public string $search = '';
     public string $activeTab = 'all';
 
@@ -104,6 +106,29 @@ class NoteList extends Component
         $note = Note::findOrFail($id);
         abort_if($note->user_id !== Auth::id(), 403);
         $note->update(['is_archived' => !$note->is_archived]);
+    }
+
+    public function duplicateNote(int $id): void
+    {
+        $note = Note::findOrFail($id);
+        abort_if($note->user_id !== Auth::id(), 403);
+        
+        Note::create([
+            'user_id' => Auth::id(),
+            'title'   => $note->title,
+            'body'    => $note->body,
+            'tag'     => $note->tag,
+        ]);
+    }
+
+    public function toggleTagPopup(): void
+    {
+        $this->showTagPopup = !$this->showTagPopup;
+    }
+
+    public function toggleFormattingPopup(): void
+    {
+        $this->showFormattingPopup = !$this->showFormattingPopup;
     }
 
     public function delete(int $id): void
@@ -196,6 +221,10 @@ class NoteList extends Component
         $otherNotes = $otherNotesQuery->latest()->paginate(12);
 
         return view('livewire.notes.note-list', [
+            'showForm' => $this->showForm,
+            'showTagPopup' => $this->showTagPopup,
+            'showFormattingPopup' => $this->showFormattingPopup,
+            'editingId' => $this->editingId,
             'pinnedNotes' => $pinnedNotes,
             'otherNotes'  => $otherNotes,
             'tags'          => Note::forUser(Auth::id())->active()->whereNotNull('tag')->where('tag', '!=', '')->select('tag')->distinct()->pluck('tag'),

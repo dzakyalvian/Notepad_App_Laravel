@@ -64,6 +64,14 @@
             background: #e8eaed;
             color: #202124;
         }
+
+        /* Editor Formatting Styles (Tailwind resets these by default) */
+        .format-editor b, .format-editor strong { font-weight: bold; }
+        .format-editor i, .format-editor em { font-style: italic; }
+        .format-editor u { text-decoration: underline; }
+        .format-editor h1 { font-size: 1.5em; font-weight: bold; margin-bottom: 0.5rem; line-height: 1.2; }
+        .format-editor h2 { font-size: 1.25em; font-weight: bold; margin-bottom: 0.5rem; line-height: 1.2; }
+        .format-editor div { margin-bottom: 0.25rem; }
     </style>
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
