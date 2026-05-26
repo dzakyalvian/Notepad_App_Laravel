@@ -1,41 +1,56 @@
-<div style="display:flex; min-height:100vh; background:#1a1a1a; color:#e5e5e5; font-family:sans-serif;">
+<div class="flex min-h-screen bg-keep-bg text-keep-textPrimary font-sans">
 
     {{-- SIDEBAR --}}
-    <div
-        style="width:220px; background:#1f1f1f; border-right:1px solid #2e2e2e; padding:1rem; display:flex; flex-direction:column; gap:6px;">
+    <div class="w-60 bg-transparent py-4 flex flex-col gap-1 shrink-0">
 
-        <button wire:click="openCreate"
-            style="background:#ea580c; color:white; border:none; border-radius:8px; padding:10px; font-size:14px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
-            + New note
+        <div class="px-4 pb-4">
+            <button wire:click="openCreate"
+                class="bg-brand-primary hover:bg-brand-dark text-white border-none rounded-[24px] py-3 px-5 text-sm font-medium cursor-pointer flex items-center justify-center gap-2 w-full shadow-[0_1px_2px_0_rgba(60,64,67,0.3),0_1px_3px_1px_rgba(60,64,67,0.15)] transition-colors">
+                <i class="fa-solid fa-plus"></i> New note
+            </button>
+        </div>
+
+        {{-- All Notes --}}
+        <button wire:click="cancelForm" 
+            class="border-none rounded-r-[24px] rounded-l-none py-2.5 px-6 text-left text-sm font-medium cursor-pointer flex items-center gap-3 w-[calc(100%-8px)] transition-colors
+            {{ $activeTab === 'all' 
+                ? 'bg-brand-light text-brand-primary hover:bg-brand-light/80 hover:text-brand-dark font-semibold' 
+                : 'bg-transparent text-keep-textSecondary hover:bg-keep-border/40 hover:text-keep-textPrimary' }}">
+            <i class="fa-regular fa-lightbulb"></i> Notes
+            <span class="ml-auto text-xs font-normal text-keep-textSecondary">{{ $totalNotes }}</span>
         </button>
 
-        <button wire:click="cancelForm"
-            style="background:{{ $activeTab === 'all' ? '#2e2e2e' : 'transparent' }}; color:{{ $activeTab === 'all' ? '#f5f5f5' : '#a3a3a3' }}; border:none; border-radius:8px; padding:9px 12px; text-align:left; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:8px;">
-            ☰ All notes
-            <span style="margin-left:auto; font-size:12px; color:#525252;">{{ $totalNotes }}</span>
+        {{-- Favorites --}}
+        <button wire:click="$set('activeTab', 'favorites')" 
+            class="border-none rounded-r-[24px] rounded-l-none py-2.5 px-6 text-left text-sm font-medium cursor-pointer flex items-center gap-3 w-[calc(100%-8px)] transition-colors
+            {{ $activeTab === 'favorites' 
+                ? 'bg-brand-light text-brand-primary hover:bg-brand-light/80 hover:text-brand-dark font-semibold' 
+                : 'bg-transparent text-keep-textSecondary hover:bg-keep-border/40 hover:text-keep-textPrimary' }}">
+            <i class="fa-regular fa-star"></i> Favorites
         </button>
 
-        <button wire:click="$set('activeTab', 'favorites')"
-            style="background:{{ $activeTab === 'favorites' ? '#2e2e2e' : 'transparent' }}; color:{{ $activeTab === 'favorites' ? '#f5f5f5' : '#a3a3a3' }}; border:none; border-radius:8px; padding:9px 12px; text-align:left; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-star"></i> Favorites
-        </button>
-
-        <button wire:click="$set('activeTab', 'trash')"
-            style="background:{{ $activeTab === 'trash' ? '#2e2e2e' : 'transparent' }}; color:{{ $activeTab === 'trash' ? '#f5f5f5' : '#a3a3a3' }}; border:none; border-radius:8px; padding:9px 12px; text-align:left; font-size:14px; cursor:pointer; display:flex; align-items:center; gap:8px;">
+        {{-- Trash --}}
+        <button wire:click="$set('activeTab', 'trash')" 
+            class="border-none rounded-r-[24px] rounded-l-none py-2.5 px-6 text-left text-sm font-medium cursor-pointer flex items-center gap-3 w-[calc(100%-8px)] transition-colors
+            {{ $activeTab === 'trash' 
+                ? 'bg-brand-light text-brand-primary hover:bg-brand-light/80 hover:text-brand-dark font-semibold' 
+                : 'bg-transparent text-keep-textSecondary hover:bg-keep-border/40 hover:text-keep-textPrimary' }}">
             <i class="fa-regular fa-trash-can"></i> Trash
         </button>
 
         @if ($tags->count() > 0)
-            <div style="margin-top:1rem;">
-                <p
-                    style="font-size:11px; color:#525252; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; padding:0 4px;">
-                    Tags</p>
-                <div style="display:flex; flex-wrap:wrap; gap:6px; padding:0 4px;">
+            <div class="mt-6 px-6">
+                <p class="text-[11px] text-keep-textSecondary font-semibold uppercase tracking-wider mb-2.5">
+                    Tags
+                </p>
+                <div class="flex flex-wrap gap-2">
                     @foreach ($tags as $t)
-                        <span
-                            style="font-size:12px; padding:3px 10px; border-radius:99px; cursor:pointer;
-                            background:{{ $t === 'Personal' ? '#3d2b7a' : ($t === 'Work' ? '#1a3d24' : ($t === 'Idea' ? '#3d2a0d' : ($t === 'Important' ? '#3d1c1c' : ($t === 'Study' ? '#122b52' : '#2e2e2e')))) }};
-                            color:{{ $t === 'Personal' ? '#a78bfa' : ($t === 'Work' ? '#34d399' : ($t === 'Idea' ? '#fbbf24' : ($t === 'Important' ? '#f87171' : ($t === 'Study' ? '#60a5fa' : '#a3a3a3')))) }};">
+                        <span class="text-xs px-3 py-1 rounded-full font-medium cursor-pointer
+                            {{ $t === 'Personal' ? 'bg-tag-personalBg text-tag-personalText' : 
+                               ($t === 'Work' ? 'bg-tag-workBg text-tag-workText' : 
+                               ($t === 'Idea' ? 'bg-tag-ideaBg text-tag-ideaText' : 
+                               ($t === 'Important' ? 'bg-tag-importantBg text-tag-importantText' : 
+                               ($t === 'Study' ? 'bg-tag-studyBg text-tag-studyText' : 'bg-tag-defaultBg text-tag-defaultText')))) }}">
                             {{ $t }}
                         </span>
                     @endforeach
@@ -45,18 +60,17 @@
     </div>
 
     {{-- MAIN --}}
-    <div style="flex:1; padding:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+    <div class="flex-1 py-6 px-8 flex flex-col gap-6">
 
         {{-- SEARCH --}}
         @if (!$showForm)
-            <div
-                style="display:flex; align-items:center; gap:10px; background:#2a2a2a; border:1px solid #3a3a3a; border-radius:99px; padding:10px 20px; width:100%;">
-                <i class="fa-solid fa-magnifying-glass" style="color:#525252; font-size:14px;"></i>
+            <div class="flex items-center gap-2.5 bg-keep-navbar border border-keep-border rounded-lg py-2.5 px-4 w-full max-w-[600px] shadow-sm transition-all focus-within:shadow-md focus-within:border-keep-borderHover mx-auto">
+                <i class="fa-solid fa-magnifying-glass text-keep-textSecondary text-sm"></i>
                 <input wire:model.live.debounce.300ms="search" type="text" placeholder="Search notes..."
-                    style="background:transparent; border:none; outline:none; color:#e5e5e5; font-size:14px; width:100%;">
+                    class="bg-transparent border-none outline-none text-keep-textPrimary text-sm w-full font-sans">
                 @if ($search)
                     <button wire:click="$set('search', '')"
-                        style="background:none; border:none; cursor:pointer; color:#525252; font-size:13px; padding:0;">
+                        class="bg-transparent border-none cursor-pointer text-keep-textSecondary text-xs p-0 flex items-center">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 @endif
@@ -65,182 +79,146 @@
 
         {{-- FORM --}}
         @if ($showForm)
-            <div
-                style="background:#242424; border:1px solid #2e2e2e; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; gap:10px;">
+            <div class="bg-keep-navbar border border-keep-border rounded-lg p-5 flex flex-col gap-3 shadow-md w-full max-w-[600px] mx-auto">
                 <input wire:model="title" type="text" placeholder="Title"
-                    style="background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:10px 14px; color:#f5f5f5; font-size:15px; font-weight:500; outline:none; width:100%;">
+                    class="bg-transparent border-none text-keep-textPrimary text-base font-semibold outline-none w-full py-1">
                 @error('title')
-                    <span style="color:#f87171; font-size:12px;">{{ $message }}</span>
+                    <span class="text-[#d93025] text-xs">{{ $message }}</span>
                 @enderror
 
                 <textarea wire:model="body" placeholder="Write your note here..." rows="4"
-                    style="background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:10px 14px; color:#e5e5e5; font-size:14px; outline:none; width:100%; resize:none;"></textarea>
+                    class="bg-transparent border-none text-keep-textBody text-sm outline-none w-full resize-none py-1 leading-relaxed"></textarea>
                 @error('body')
-                    <span style="color:#f87171; font-size:12px;">{{ $message }}</span>
+                    <span class="text-[#d93025] text-xs">{{ $message }}</span>
                 @enderror
 
                 {{-- TAG PILLS --}}
-                <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                    <button type="button" wire:click="$set('tag', 'Personal')"
-                        style="padding:4px 12px; border-radius:99px; border:none; font-size:12px; font-weight:500; cursor:pointer;
-                            background:{{ $tag === 'Personal' ? '#a78bfa' : '#3d2b7a' }};
-                            color:{{ $tag === 'Personal' ? '#1a1a1a' : '#a78bfa' }};">
+                <div class="flex flex-wrap gap-1.5 my-2">
+                    <button type="button" wire:click="$set('tag', 'Personal')" 
+                        class="px-3 py-1 rounded-full text-xs font-medium cursor-pointer border-none transition-colors
+                        {{ $tag === 'Personal' ? 'bg-tag-personalText text-white' : 'bg-tag-personalBg text-tag-personalText' }}">
                         Personal
                     </button>
-                    <button type="button" wire:click="$set('tag', 'Work')"
-                        style="padding:4px 12px; border-radius:99px; border:none; font-size:12px; font-weight:500; cursor:pointer;
-                            background:{{ $tag === 'Work' ? '#34d399' : '#1a3d24' }};
-                            color:{{ $tag === 'Work' ? '#1a1a1a' : '#34d399' }};">
+                    <button type="button" wire:click="$set('tag', 'Work')" 
+                        class="px-3 py-1 rounded-full text-xs font-medium cursor-pointer border-none transition-colors
+                        {{ $tag === 'Work' ? 'bg-tag-workText text-white' : 'bg-tag-workBg text-tag-workText' }}">
                         Work
                     </button>
-                    <button type="button" wire:click="$set('tag', 'Idea')"
-                        style="padding:4px 12px; border-radius:99px; border:none; font-size:12px; font-weight:500; cursor:pointer;
-                            background:{{ $tag === 'Idea' ? '#fbbf24' : '#3d2a0d' }};
-                            color:{{ $tag === 'Idea' ? '#1a1a1a' : '#fbbf24' }};">
+                    <button type="button" wire:click="$set('tag', 'Idea')" 
+                        class="px-3 py-1 rounded-full text-xs font-medium cursor-pointer border-none transition-colors
+                        {{ $tag === 'Idea' ? 'bg-tag-ideaText text-white' : 'bg-tag-ideaBg text-tag-ideaText' }}">
                         Idea
                     </button>
-                    <button type="button" wire:click="$set('tag', 'Important')"
-                        style="padding:4px 12px; border-radius:99px; border:none; font-size:12px; font-weight:500; cursor:pointer;
-                            background:{{ $tag === 'Important' ? '#f87171' : '#3d1c1c' }};
-                            color:{{ $tag === 'Important' ? '#1a1a1a' : '#f87171' }};">
+                    <button type="button" wire:click="$set('tag', 'Important')" 
+                        class="px-3 py-1 rounded-full text-xs font-medium cursor-pointer border-none transition-colors
+                        {{ $tag === 'Important' ? 'bg-tag-importantText text-white' : 'bg-tag-importantBg text-tag-importantText' }}">
                         Important
                     </button>
-                    <button type="button" wire:click="$set('tag', 'Study')"
-                        style="padding:4px 12px; border-radius:99px; border:none; font-size:12px; font-weight:500; cursor:pointer;
-                            background:{{ $tag === 'Study' ? '#60a5fa' : '#122b52' }};
-                            color:{{ $tag === 'Study' ? '#1a1a1a' : '#60a5fa' }};">
+                    <button type="button" wire:click="$set('tag', 'Study')" 
+                        class="px-3 py-1 rounded-full text-xs font-medium cursor-pointer border-none transition-colors
+                        {{ $tag === 'Study' ? 'bg-tag-studyText text-white' : 'bg-tag-studyBg text-tag-studyText' }}">
                         Study
                     </button>
-                    <button type="button" wire:click="$set('showCustomTag', true)"
-                        style="padding:4px 12px; border-radius:99px; border:none; font-size:12px; font-weight:500; cursor:pointer;
-        background:{{ $showCustomTag ? '#525252' : '#2e2e2e' }};
-        color:#a3a3a3;">
-                        Other
+                    <button type="button" wire:click="$set('showCustomTag', true)" 
+                        class="px-3 py-1 rounded-full text-xs font-medium cursor-pointer bg-[#f1f3f4] text-keep-textSecondary border border-dashed border-keep-border transition-colors">
+                        + Custom Tag
                     </button>
 
                     @if ($showCustomTag)
-                        <div style="display:flex; align-items:center; gap:6px; width:100%; margin-top:4px;">
-                            <input wire:model="customTag" type="text" placeholder="Type your tag..."
+                        <div class="flex items-center gap-1.5 w-full mt-2">
+                            <input wire:model="customTag" type="text" placeholder="Type tag name..."
                                 wire:keydown.enter="applyCustomTag"
-                                style="background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:6px 12px; color:#e5e5e5; font-size:13px; outline:none; flex:1;">
+                                class="bg-keep-navbar border border-keep-border rounded-md py-1.5 px-3 text-keep-textPrimary text-xs outline-none flex-1">
                             <button wire:click="applyCustomTag"
-                                style="padding:6px 12px; border-radius:8px; border:none; background:#525252; color:#e5e5e5; font-size:12px; cursor:pointer;">
+                                class="py-1.5 px-3 rounded-md border-none bg-brand-primary text-white text-xs font-medium cursor-pointer">
                                 Add
                             </button>
                             <button wire:click="$set('showCustomTag', false)"
-                                style="padding:6px 12px; border-radius:8px; border:none; background:#2e2e2e; color:#525252; font-size:12px; cursor:pointer;">
+                                class="py-1.5 px-3 rounded-md border-none bg-[#f1f3f4] text-keep-textSecondary text-xs cursor-pointer">
                                 ✕
                             </button>
                         </div>
                     @endif
                 </div>
 
-                <div style="display:flex; gap:8px;">
-                    <button wire:click="save"
-                        style="background:#ea580c; color:white; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:500; cursor:pointer;">
-                        {{ $editingId ? 'Update' : 'Save' }}
-                    </button>
+                <div class="flex gap-2 justify-end border-t border-keep-bg pt-3 mt-1">
                     <button wire:click="cancelForm"
-                        style="background:#2e2e2e; color:#a3a3a3; border:none; border-radius:8px; padding:9px 20px; font-size:13px; cursor:pointer;">
+                        class="bg-transparent text-keep-textSecondary border-none rounded py-2 px-4 text-xs font-medium cursor-pointer transition-colors hover:bg-keep-bg">
                         Cancel
+                    </button>
+                    <button wire:click="save"
+                        class="bg-brand-primary text-white border-none rounded py-2 px-5 text-xs font-medium cursor-pointer transition-colors hover:bg-brand-dark">
+                        {{ $editingId ? 'Update' : 'Save' }}
                     </button>
                 </div>
             </div>
         @else
-            {{-- NOTES GRID --}}
-            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:12px;">
-                @forelse($notes as $note)
-                    <div wire:key="note-{{ $note->id }}"
-                        style="background:#242424; border:1px solid #2e2e2e; border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                            <p style="font-size:15px; font-weight:500; color:#f5f5f5;">{{ $note->title }}</p>
-                            @if ($activeTab !== 'trash')
-                                <button wire:click="toggleFavorite({{ $note->id }})"
-                                    wire:key="star-{{ $note->id }}" class="btn-star"
-                                    data-tooltip="{{ $note->is_favorite ? 'Remove from favorites' : 'Favorite' }}"
-                                    style="color:{{ $note->is_favorite ? '#facc15' : '#525252' }};">
-                                    @if ($note->is_favorite)
-                                        <i class="fa-solid fa-star"></i>
-                                    @else
-                                        <i class="fa-regular fa-star"></i>
-                                    @endif
-                                </button>
-                            @endif
-                        </div>
+            {{-- NOTES GRID ARSITEKTUR GOOGLE KEEP --}}
+            <div class="flex flex-col gap-8 w-full">
 
-                        <p style="font-size:13px; color:#737373; line-height:1.5;">
-                            {{ Str::limit($note->body, 80) }}
+                {{-- ================= PINNED NOTES GRID ================= --}}
+                @if($pinnedNotes->count() > 0)
+                    <div class="flex flex-col gap-2">
+                        <p class="text-[11px] text-keep-textSecondary font-semibold uppercase tracking-wider px-1">
+                            Pinned
                         </p>
-
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:auto;">
-                            @if ($note->tag)
-                                <span
-                                    style="font-size:11px; padding:3px 10px; border-radius:99px;
-                                    background:{{ $note->tag === 'Personal' ? '#3d2b7a' : ($note->tag === 'Work' ? '#1a3d24' : ($note->tag === 'Idea' ? '#3d2a0d' : ($note->tag === 'Important' ? '#3d1c1c' : ($note->tag === 'Study' ? '#122b52' : '#2e2e2e')))) }};
-                                    color:{{ $note->tag === 'Personal' ? '#a78bfa' : ($note->tag === 'Work' ? '#34d399' : ($note->tag === 'Idea' ? '#fbbf24' : ($note->tag === 'Important' ? '#f87171' : ($note->tag === 'Study' ? '#60a5fa' : '#a3a3a3')))) }};">
-                                    {{ $note->tag }}
-                                </span>
-                            @else
-                                <span></span>
-                            @endif
-
-                            @if ($activeTab === 'trash')
-                                <div style="display:flex; gap:6px;">
-                                    <button wire:click="restore({{ $note->id }})"
-                                        style="font-size:11px; padding:4px 10px; border-radius:6px; background:#1a2e1a; color:#4ade80; border:none; cursor:pointer;">Restore</button>
-                                    <button wire:click="forceDelete({{ $note->id }})"
-                                        wire:confirm="Delete permanently?"
-                                        style="font-size:11px; padding:4px 10px; border-radius:6px; background:#2d1515; color:#f87171; border:none; cursor:pointer;">Delete</button>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            @foreach($pinnedNotes as $note)
+                                <div wire:key="note-pinned-{{ $note->id }}">
+                                    @include('livewire.notes.partials.note-card', ['note' => $note, 'viewContext' => 'pinned'])
                                 </div>
-                            @else
-                                <div style="display:flex; gap:8px;">
-                                    <button wire:click="openEdit({{ $note->id }})" class="btn-edit"
-                                        data-tooltip="Edit">
-                                        <i class="fa-regular fa-pen-to-square"></i>
-                                    </button>
-                                    <button wire:click="delete({{ $note->id }})" class="btn-delete"
-                                        data-tooltip="Remove">
-                                        <i class="fa-regular fa-trash-can"></i>
-                                    </button>
-                                </div>
-                            @endif
+                            @endforeach
                         </div>
-
-                        <p style="font-size:11px; color:#3a3a3a;">{{ $note->created_at->format('d M Y') }}</p>
                     </div>
-                @empty
-                    <div style="grid-column:1/-1; text-align:center; padding:3rem; color:#525252;">
-                        <p style="font-size:32px; margin-bottom:8px;"><i class="fa-solid fa-bookmark"></i></p>
-                        <p style="font-size:14px;">No notes yet. Create your first note!</p>
-                    </div>
-                @endforelse
-            </div>
+                @endif
 
-            {{-- PAGINATION --}}
-            @if ($notes->hasPages())
-                <div style="display:flex; justify-content:center; align-items:center; gap:6px; margin-top:1rem;">
-                    @if ($notes->onFirstPage())
-                        <span
-                            style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#525252; font-size:13px;">←
-                            Prev</span>
-                    @else
-                        <button wire:click="previousPage"
-                            style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#e5e5e5; font-size:13px; border:none; cursor:pointer;">←
-                            Prev</button>
+                {{-- ================= OTHERS / REGULAR NOTES GRID ================= --}}
+                <div class="flex flex-col gap-2">
+                    @if($pinnedNotes->count() > 0 && $otherNotes->count() > 0)
+                        <p class="text-[11px] text-keep-textSecondary font-semibold uppercase tracking-wider px-1">
+                            Others
+                        </p>
                     @endif
 
-                    <span style="padding:6px 12px; color:#525252; font-size:13px;">
-                        {{ $notes->currentPage() }} / {{ $notes->lastPage() }}
+                    @if($otherNotes->count() > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            @foreach($otherNotes as $note)
+                                <div wire:key="note-other-{{ $note->id }}">
+                                    @include('livewire.notes.partials.note-card', ['note' => $note, 'viewContext' => 'other'])
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        {{-- Empty State jika benar-benar kosong di kedua sisi --}}
+                        @if($pinnedNotes->count() == 0)
+                            <div class="text-center py-20 px-8 text-keep-textSecondary">
+                                <p class="text-5xl m-0 mb-4 text-keep-border"><i class="fa-regular fa-lightbulb"></i></p>
+                                <p class="text-base font-semibold m-0 mb-1 text-keep-textPrimary">No notes found</p>
+                                <p class="text-xs m-0">Notes you add appear here</p>
+                            </div>
+                        @endif
+                    @endif
+                </div>
+
+            </div>
+
+            {{-- PAGINATION (Hanya terikat pada $otherNotes) --}}
+            @if ($otherNotes->hasPages())
+                <div class="flex justify-center items-center gap-2 mt-8">
+                    @if ($otherNotes->onFirstPage())
+                        <span class="py-1.5 px-3 rounded-lg bg-keep-border/30 text-keep-textSecondary/50 text-xs border border-keep-border/40">← Prev</span>
+                    @else
+                        <button wire:click="previousPage" class="py-1.5 px-3 rounded-lg bg-keep-card text-keep-textSecondary text-xs border border-keep-border cursor-pointer transition-colors hover:bg-keep-bg hover:text-keep-textPrimary">← Prev</button>
+                    @endif
+
+                    <span class="py-1.5 px-3 text-keep-textSecondary text-xs font-semibold">
+                        {{ $otherNotes->currentPage() }} / {{ $otherNotes->lastPage() }}
                     </span>
 
-                    @if ($notes->hasMorePages())
-                        <button wire:click="nextPage"
-                            style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#e5e5e5; font-size:13px; border:none; cursor:pointer;">Next
-                            →</button>
+                    @if ($otherNotes->hasMorePages())
+                        <button wire:click="nextPage" class="py-1.5 px-3 rounded-lg bg-keep-card text-keep-textSecondary text-xs border border-keep-border cursor-pointer transition-colors hover:bg-keep-bg hover:text-keep-textPrimary">Next →</button>
                     @else
-                        <span
-                            style="padding:6px 12px; border-radius:8px; background:#2e2e2e; color:#525252; font-size:13px;">Next
-                            →</span>
+                        <button class="py-1.5 px-3 rounded-lg bg-keep-border/30 text-keep-textSecondary/50 text-xs border border-keep-border/40" disabled>Next →</button>
                     @endif
                 </div>
             @endif

@@ -90,6 +90,15 @@ class NoteList extends Component
         $note->save();
     }
 
+    public function togglePin($id)
+{
+    $note = Note::findOrFail($id);
+
+    $note->update([
+        'is_pinned' => !$note->is_pinned
+    ]);
+}
+
     public function delete(int $id): void
     {
         $note = Note::findOrFail($id);
@@ -126,29 +135,60 @@ class NoteList extends Component
         }
     }
 
-    public function render()
+   public function render()
     {
-        $query = Note::forUser(Auth::id())
-            ->select('id', 'title', 'body', 'tag', 'is_favorite', 'is_deleted', 'created_at');
+        // 1. Base Query Builder dengan Select Columns bawaan Anda
+        $baseQuery = Note::forUser(Auth::id())
+            ->select(
+                'id',
+                'title',
+                'body',
+                'tag',
+                'is_favorite',
+                'is_pinned',
+                'is_deleted',
+                'created_at'
+            );
 
+        // 2. Terapkan Filter Tab bawaan Anda
         if ($this->activeTab === 'favorites') {
-            $query->favorites();
+            $baseQuery->favorites();
         } elseif ($this->activeTab === 'trash') {
-            $query->trashed();
+            $baseQuery->trashed();
         } else {
-            $query->active();
+            $baseQuery->active();
         }
 
+        // 3. Terapkan Filter Pencarian bawaan Anda
         if ($this->search) {
-            $query->where(function ($q) {
+            $baseQuery->where(function ($q) {
                 $q->where('title', 'like', '%' . $this->search . '%')
                     ->orWhere('body', 'like', '%' . $this->search . '%');
             });
         }
 
+        // 4. Split Query untuk PINNED NOTES
+        // Pinned section hanya tampil jika bukan di halaman trash
+        $pinnedNotes = collect();
+        if ($this->activeTab !== 'trash') {
+            $pinnedNotes = (clone $baseQuery)
+                ->where('is_pinned', true)
+                ->latest()
+                ->get();
+        }
+
+        // 5. Split Query untuk OTHER NOTES (Dipaginasi)
+        $otherNotesQuery = (clone $baseQuery);
+        if ($this->activeTab !== 'trash') {
+            $otherNotesQuery->where('is_pinned', false);
+        }
+        
+        $otherNotes = $otherNotesQuery->latest()->paginate(12);
+
         return view('livewire.notes.note-list', [
-            'notes'         => $query->latest()->paginate(12),
-            'tags' => Note::forUser(Auth::id())->active()->whereNotNull('tag')->where('tag', '!=', '')->select('tag')->distinct()->pluck('tag'),
+            'pinnedNotes' => $pinnedNotes,
+            'otherNotes'  => $otherNotes,
+            'tags'          => Note::forUser(Auth::id())->active()->whereNotNull('tag')->where('tag', '!=', '')->select('tag')->distinct()->pluck('tag'),
             'availableTags' => $this->availableTags,
             'totalNotes'    => Note::forUser(Auth::id())->active()->count(),
         ]);

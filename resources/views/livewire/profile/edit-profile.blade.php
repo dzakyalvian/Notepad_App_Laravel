@@ -1,64 +1,66 @@
-<div style="max-width:480px; margin:0 auto; padding:2rem;">
+<div class="max-w-[480px] mx-auto py-10 px-6 font-sans">
 
     @if (session('success'))
-        <div style="background:#1a2e1a; color:#4ade80; padding:10px 14px; border-radius:8px; font-size:13px; margin-bottom:1rem;">
-            ✓ {{ session('success') }}
+        <div class="bg-[#e6f4ea] text-[#137333] border border-[#c3e6cb] p-2.5 rounded-lg text-xs mb-6 font-medium flex items-center gap-2">
+            <i class="fa-solid fa-circle-check"></i> {{ session('success') }}
         </div>
     @endif
 
-    {{-- AVATAR --}}
-    <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:2rem;">
-        @if (auth()->user()->avatar)
-            <img src="{{ Storage::url(auth()->user()->avatar) }}"
-                style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #ea580c;">
-        @else
-            <div style="width:80px; height:80px; border-radius:50%; background:#ea580c; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:600; color:white;">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+    <div class="bg-keep-navbar border border-keep-border rounded-lg p-8 shadow-sm">
+        {{-- AVATAR --}}
+        <div class="flex flex-col items-center mb-8">
+            @if (auth()->user()->avatar)
+                <img src="{{ Storage::url(auth()->user()->avatar) }}"
+                    class="w-20 h-20 rounded-full object-cover border-2 border-brand-primary">
+            @else
+                <div class="w-20 h-20 rounded-full bg-brand-primary flex items-center justify-center text-3xl font-semibold text-white">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+            @endif
+
+            <label class="inline-block mt-3 text-xs text-brand-primary font-medium cursor-pointer">
+                Change photo
+                <input wire:model="avatar" type="file" accept="image/*" class="hidden">
+            </label>
+
+            @if (auth()->user()->avatar)
+                <button wire:click="deleteAvatar" wire:confirm="Remove profile photo?"
+                    class="bg-transparent border-none text-[#d93025] text-xs cursor-pointer mt-1.5 font-medium flex items-center gap-1">
+                    <i class="fa-regular fa-trash-can"></i> Remove photo
+                </button>
+            @endif
+
+            @if ($avatar)
+                <p class="text-xs text-keep-textSecondary mt-1.5 font-medium">New photo selected ✓</p>
+            @endif
+        </div>
+
+        {{-- FORM --}}
+        <div class="flex flex-col gap-4">
+            <div>
+                <label class="text-xs text-keep-textSecondary font-semibold block mb-1.5 uppercase tracking-wider">Display name</label>
+                <input wire:model="name" type="text"
+                    class="w-full bg-keep-navbar border border-keep-border rounded-lg py-2.5 px-3.5 text-keep-textPrimary text-sm outline-none transition-colors focus:border-keep-borderHover">
+                @error('name')
+                    <span class="text-[#d93025] text-xs mt-1 block">{{ $message }}</span>
+                @enderror
             </div>
-        @endif
 
-        <label style="display:inline-block; margin-top:10px; font-size:13px; color:#ea580c; cursor:pointer;">
-            Change photo
-            <input wire:model="avatar" type="file" accept="image/*" style="display:none;">
-        </label>
+            <div>
+                <label class="text-xs text-keep-textSecondary font-semibold block mb-1.5 uppercase tracking-wider">Email address</label>
+                <input type="text" value="{{ auth()->user()->email }}" disabled
+                    class="w-full bg-keep-bg border border-keep-border/60 rounded-lg py-2.5 px-3.5 text-keep-textSecondary/80 text-sm outline-none cursor-not-allowed">
+            </div>
 
-        @if (auth()->user()->avatar)
-            <button wire:click="deleteAvatar" wire:confirm="Remove profile photo?"
-                style="background:none; border:none; color:#f87171; font-size:12px; cursor:pointer; margin-top:4px;">
-                🗑 Remove photo
+            <button wire:click="save"
+                class="bg-brand-primary hover:bg-brand-dark text-white border-none rounded-lg p-3 text-sm font-medium cursor-pointer mt-2 transition-colors flex items-center justify-center gap-2">
+                Save changes
             </button>
-        @endif
 
-        @if ($avatar)
-            <p style="font-size:12px; color:#525252; margin-top:4px;">New photo selected ✓</p>
-        @endif
-    </div>
-
-    {{-- FORM --}}
-    <div style="display:flex; flex-direction:column; gap:12px;">
-        <div>
-            <label style="font-size:12px; color:#737373; display:block; margin-bottom:4px;">Display name</label>
-            <input wire:model="name" type="text"
-                style="width:100%; background:#2a2a2a; border:1px solid #3a3a3a; border-radius:8px; padding:10px 14px; color:#f5f5f5; font-size:14px; outline:none; box-sizing:border-box;">
-            @error('name')
-                <span style="color:#f87171; font-size:12px;">{{ $message }}</span>
-            @enderror
+            <a href="/dashboard"
+                class="text-center text-xs text-keep-textSecondary font-medium no-underline block transition-colors hover:text-keep-textPrimary mt-2">
+                ← Back to notes
+            </a>
         </div>
-
-        <div>
-            <label style="font-size:12px; color:#737373; display:block; margin-bottom:4px;">Email</label>
-            <input type="text" value="{{ auth()->user()->email }}" disabled
-                style="width:100%; background:#1f1f1f; border:1px solid #2e2e2e; border-radius:8px; padding:10px 14px; color:#525252; font-size:14px; outline:none; box-sizing:border-box;">
-        </div>
-
-        <button wire:click="save"
-            style="background:#ea580c; color:white; border:none; border-radius:8px; padding:10px; font-size:14px; font-weight:500; cursor:pointer; margin-top:4px;">
-            Save changes
-        </button>
-
-        <a href="/dashboard"
-            style="text-align:center; font-size:13px; color:#525252; text-decoration:none; display:block;">
-            ← Back to notes
-        </a>
     </div>
 </div>
